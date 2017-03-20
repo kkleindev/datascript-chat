@@ -14,7 +14,7 @@
   (goog.string/format "%02d:%02d" (.getHours date) (.getMinutes date)))
 
 (defn- should-scroll? [node]
-  (<= 
+  (<=
     (- (.-scrollHeight node) (.-scrollTop node) (.-offsetHeight node))
     0))
 
@@ -89,7 +89,7 @@
         [:span.message__ts
           (format-time (:message/timestamp msg))]]
       (text (:message/text msg))]))
-     
+
 (def sticky-mixin
   { :will-update
     (fn [state]
@@ -101,16 +101,19 @@
         (let [node (.getDOMNode (:rum/react-component state))]
           (set! (.-scrollTop node) (.-scrollHeight node))))
       state) })
-     
+
 (rum/defc chat-pane < sticky-mixin [db]
   (let [[room-id room-title] (d/q '[:find [?r ?t]
                                     :where [?r :room/selected true]
                                            [?r :room/title ?t]] db)
+        room-count (d/q '[:find (count ?m)
+                          :where [?r :room/selected true]
+                                 [?m :message/room ?r]] db)
         msgs (->> (u/qes-by db :message/room room-id)
                   (sort-by :message/timestamp))]
     [:#chat__pane.pane
       [:#chat__header.header
-        [:.title room-title]]
+        [:.title (str room-title " : " room-count)]]
         (map message msgs)]))
 
 (defn- textarea-keydown [callback]
@@ -135,6 +138,8 @@
     [:#window
       [:#rooms (rooms-pane db event-bus)]
       [:#chat  (chat-pane db)]
+      ;;(rooms-pane db event-bus)
+      ;;(chat-pane db)
       (compose-pane db event-bus)]))
 
 ;; RENDER MACHINERY
