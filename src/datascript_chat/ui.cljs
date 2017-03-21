@@ -135,11 +135,9 @@
 
 (rum/defc window < rum/reactive [conn event-bus]
   (let [db (rum/react conn)]
-    [:#window
-      [:#rooms (rooms-pane db event-bus)]
-      [:#chat  (chat-pane db)]
-      ;;(rooms-pane db event-bus)
-      ;;(chat-pane db)
+    [:div#window
+      [:div#rooms (rooms-pane db event-bus)]
+      [:div#chat  (chat-pane db)]
       (compose-pane db event-bus)]))
 
 ;; RENDER MACHINERY
