@@ -106,7 +106,7 @@
   (let [[room-id room-title] (d/q '[:find [?r ?t]
                                     :where [?r :room/selected true]
                                            [?r :room/title ?t]] db)
-        room-count (d/q '[:find (count ?m)
+        room-count (d/q '[:find (count ?m) .
                           :where [?r :room/selected true]
                                  [?m :message/room ?r]] db)
         msgs (->> (u/qes-by db :message/room room-id)
