@@ -26,6 +26,8 @@
 (defn- send-msg [chan text]
   (async/put! chan [:send-msg text]))
 
+(defn- select-target [chan target]
+  (async/put! chan [:select-target target]))
 
 ;; UI COMPONENTS
 
@@ -102,19 +104,43 @@
           (set! (.-scrollTop node) (.-scrollHeight node))))
       state) })
 
+(defn- choose-header [room-id room-title room-count target]
+  (if (some? room-id)
+  (str room-title " : " room-count)
+  target
+  ))
+
+(defn- choose-messages [room-id msgs t-msgs]
+  (if (some? room-id)
+  msgs
+  t-msgs
+  ))
+
 (rum/defc chat-pane < sticky-mixin [db]
   (let [[room-id room-title] (d/q '[:find [?r ?t]
                                     :where [?r :room/selected true]
                                            [?r :room/title ?t]] db)
+        name "Toom"
+        target (d/q '[:find ?t
+                      :in $ ?n
+                      :where [?t :user/name ?n]] db name)
+        ;target "Toom"
         room-count (d/q '[:find (count ?m) .
                           :where [?r :room/selected true]
                                  [?m :message/room ?r]] db)
         msgs (->> (u/qes-by db :message/room room-id)
-                  (sort-by :message/timestamp))]
+                  (sort-by :message/timestamp))
+        t-msgs (->> (u/qes-by db :message/author target)
+                    (sort-by :message/timestamp))]
+        ;t-msgs (->> (d/q '[:find [?m ...]
+        ;                    :in $ ?t
+        ;                    :where [?m :message/author ?t]]
+        ;                  db target))]
     [:#chat__pane.pane
       [:#chat__header.header
-        [:.title (str room-title " : " room-count)]]
-        (map message msgs)]))
+        [:.title (choose-header room-id room-title room-count target)]]
+        ;(map message (choose-messages room-id msgs t-msgs))]))
+        (map message t-msgs)]))
 
 (defn- textarea-keydown [callback]
   (fn [e]
