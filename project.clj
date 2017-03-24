@@ -12,28 +12,28 @@
   ]
   :cljsbuild {
     :builds [
-      { :id "none"
-        :source-paths ["src"]
-        :compiler {
-          :main          datascript-chat.core
-          :output-to     "target/datascript-chat.js"
-          :output-dir    "target/none"
-          :optimizations :none
-          :source-map    true
-        }}
-      { :id "advanced"
-        :source-paths ["src"]
-        :compiler {
-          :main          datascript-chat.core
-          :output-to     "target/datascript-chat.js"
-          :optimizations :advanced
-          :pretty-print  false
-        }}
+      ;{ :id "none"
+      ;  :source-paths ["src"]
+      ;  :compiler {
+      ;    :main          datascript-chat.core
+      ;    :output-to     "target/datascript-chat.js"
+      ;    :output-dir    "target/none"
+      ;    :optimizations :none
+      ;    :source-map    true
+      ;  }}
+      ;{ :id "advanced"
+      ;  :source-paths ["src"]
+      ;  :compiler {
+      ;    :main          datascript-chat.core
+      ;    :output-to     "target/datascript-chat.js"
+      ;    :optimizations :advanced
+      ;    :pretty-print  false
+      ;  }}
         {:id "dev"
         :source-paths ["src"]
         :figwheel true
         :compiler {
-          :main datasrcipt-chat.core
+          :main datascript-chat.core
           :output-to     "target/datascript-chat.js"
         }}
 
