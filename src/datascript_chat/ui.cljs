@@ -76,6 +76,12 @@
                     event-bus))
            rooms)]))
 
+(rum/defc target-pane [db event-bus]
+  (let []
+    [:#targets__pane.pane
+      [:#targets__header.header
+        [:.title "Targets"]]]))
+
 (rum/defc text < rum/static [text]
   [:.message__text
     (map #(vector :p %) (str/split-lines text))])
@@ -107,7 +113,7 @@
 (defn- choose-header [room-id room-title room-count target]
   (if (some? room-id)
   (str room-title " : " room-count)
-  target
+  "Toom's messages"
   ))
 
 (defn- choose-messages [room-id msgs t-msgs]
@@ -159,7 +165,9 @@
 (rum/defc window < rum/reactive [conn event-bus]
   (let [db (rum/react conn)]
     [:div#window
-      [:div#rooms (rooms-pane db event-bus)]
+      [:div#selection
+        [:div#rooms (rooms-pane db event-bus)]
+        [:div#targets (target-pane db event-bus)]]
       [:div#chat  (chat-pane db)]
       (compose-pane db event-bus)]))
 
