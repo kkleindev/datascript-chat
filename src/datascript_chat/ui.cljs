@@ -120,11 +120,8 @@
   (let [[room-id room-title] (d/q '[:find [?r ?t]
                                     :where [?r :room/selected true]
                                            [?r :room/title ?t]] db)
-        name "Toom"
-        target (d/q '[:find ?t
-                      :in $ ?n
-                      :where [?t :user/name ?n]] db name)
-        ;target "Toom"
+       ;the function returns {:db/id 9}
+        target (:db/id (u/qe-by db :user/name "Toom"))
         room-count (d/q '[:find (count ?m) .
                           :where [?r :room/selected true]
                                  [?m :message/room ?r]] db)
@@ -139,8 +136,8 @@
     [:#chat__pane.pane
       [:#chat__header.header
         [:.title (choose-header room-id room-title room-count target)]]
-        ;(map message (choose-messages room-id msgs t-msgs))]))
-        (map message t-msgs)]))
+        (map message (choose-messages room-id msgs t-msgs))]))
+        ;(map message t-msgs)]))
 
 (defn- textarea-keydown [callback]
   (fn [e]
