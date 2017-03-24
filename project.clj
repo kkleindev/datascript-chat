@@ -8,8 +8,9 @@
   ]
   :plugins [
     [lein-cljsbuild "1.1.0"]
+    [lein-figwheel "0.5.0-1"]
   ]
-  :cljsbuild { 
+  :cljsbuild {
     :builds [
       { :id "none"
         :source-paths ["src"]
@@ -28,5 +29,13 @@
           :optimizations :advanced
           :pretty-print  false
         }}
+        {:id "dev"
+        :source-paths ["src"]
+        :figwheel true
+        :compiler {
+          :main datasrcipt-chat.core
+          :output-to     "target/datascript-chat.js"
+        }}
+
   ]}
 )
