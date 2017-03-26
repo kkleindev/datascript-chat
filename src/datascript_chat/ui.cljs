@@ -55,6 +55,12 @@
             ])
         [:.topic__title (:room/title room)])]))
 
+(rum/defc target [name event-bus]
+  [:.topic { :on-click (fn [_] (select-target event-bus 9))}
+     [:.topic__title "Toom"]
+     [:img.topic__avatar {:src avatar}]]
+  )
+
 (rum/defc rooms-pane [db event-bus]
   (let [rooms         (->> (u/qes-by db :room/title)
                            (sort-by :room/title))
@@ -77,10 +83,13 @@
            rooms)]))
 
 (rum/defc target-pane [db event-bus]
-  (let []
+  (let [avatar (d/q '[:find ?a .
+                    :where [?u :user/avatar ?a]
+                    [?u :user/name "Toom"]] db)]
     [:#targets__pane.pane
       [:#targets__header.header
-        [:.title "Targets"]]]))
+        [:.title "Targets"]]
+      (target "Toom" avatar)]))
 
 (rum/defc text < rum/static [text]
   [:.message__text
