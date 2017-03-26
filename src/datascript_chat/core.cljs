@@ -40,20 +40,20 @@
 
 (defn ^:export start []
   (ui/mount conn event-bus)
-  
+
   ;; initial rooms list population
   (server/call server/get-rooms []
     (fn [rooms]
       (d/transact! conn rooms)
       (async/put! event-bus [:select-room (:db/id (first rooms))])))
-  
+
   ;; initial logged in user population
   (server/call server/whoami []
     (fn [user]
       (d/transact! conn [(assoc user
                            :user/me true
                            :user/state :loaded)])))
-  
+
   ;; subscription to server messages push
   (server/subscribe
     (fn [message]
@@ -137,6 +137,15 @@
     [:db.fn/call mark-read room-id]
   ]))
 
+(defn- deselect-room [db target]
+  (let [selected (d/q '[:find ?r .
+                        :where [?r :room/selected true]] db)]
+    (map (fn [rid] [:db/retract rid :room/selected true]) [selected])))
+
+(go-loop-sub event-bus-pub :select-target [_ target]
+  (d/transact! conn [
+    [:db.fn/call deselect-room target]]))
+
 
 ;; Clean-up: keeping last N messages per room
 (go-loop-sub event-bus-pub :recv-msg [_ msg]
@@ -152,7 +161,7 @@
                          set)
         ;; All other messages in same room
         remove-msgs (d/q '[:find [?m ...]
-                           :in $ ?room-id ?remove-pred 
+                           :in $ ?room-id ?remove-pred
                            :where [?m :message/room ?room-id]
                            [(?remove-pred ?m)]] ;; filter by custom predicate
                          db
